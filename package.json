@@ -1,0 +1,13 @@
+{
+  "name": "mind-mvp",
+  "private": true,
+  "description": "Mind – Sistema de apoio ao acompanhamento de saúde mental (MVP)",
+  "scripts": {
+    "install:all": "npm --prefix backend install && npm --prefix app install",
+    "lint": "npm --prefix backend run lint && npm --prefix app run lint",
+    "typecheck": "npm --prefix backend run typecheck && npm --prefix app run typecheck",
+    "test": "npm --prefix backend test",
+    "backend": "npm --prefix backend run start:dev",
+    "app": "npm --prefix app start"
+  }
+}
