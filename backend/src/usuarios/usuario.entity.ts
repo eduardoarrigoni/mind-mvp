@@ -1,10 +1,4 @@
-import {
-  ChildEntity,
-  Column,
-  Entity,
-  TableInheritance,
-  Unique,
-} from 'typeorm';
+import { ChildEntity, Column, Entity, TableInheritance, Unique } from 'typeorm';
 import { ObjetoPersistente } from '../database/persistencia/objeto-persistente.js';
 
 export enum Papel {
