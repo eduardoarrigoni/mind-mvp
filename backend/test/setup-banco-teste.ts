@@ -8,7 +8,9 @@ import { opcoesBanco } from '../src/database/data-source.js';
 export default async function setup(): Promise<void> {
   const nomeBanco = process.env.DB_NAME_TEST ?? 'mind_test';
   if (!nomeBanco.endsWith('_test')) {
-    throw new Error(`Recusando recriar o banco "${nomeBanco}": use um banco *_test.`);
+    throw new Error(
+      `Recusando recriar o banco "${nomeBanco}": use um banco *_test.`,
+    );
   }
   const fonte = new DataSource(
     opcoesBanco({ ...process.env, DB_NAME: nomeBanco }),
