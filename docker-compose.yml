@@ -1,0 +1,23 @@
+# Banco de desenvolvimento e de testes do Mind.
+# Uso: docker compose up -d
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: mind-postgres
+    environment:
+      POSTGRES_USER: mind
+      POSTGRES_PASSWORD: mind
+      POSTGRES_DB: mind
+    ports:
+      - '5432:5432'
+    volumes:
+      - mind-pgdata:/var/lib/postgresql/data
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U mind -d mind']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  mind-pgdata:
