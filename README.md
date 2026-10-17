@@ -38,11 +38,17 @@ mind-mvp/
 # 1. Instalar dependências
 npm run install:all
 
-# 2. Back-end (porta 3000)
+# 2. Banco PostgreSQL (cria também o banco de testes mind_test)
+docker compose up -d
+
+# 3. Criar/atualizar o esquema do banco (somente por migrations)
 cd backend
+npm run migration:run       # migration:revert desfaz a última; migration:show lista
+
+# 4. Back-end (porta 3000)
 npm run start:dev
 
-# 3. App (em outro terminal)
+# 5. App (em outro terminal)
 cd app
 npm start          # escaneie o QR code com o Expo Go
 npm run web        # ou abra no navegador
@@ -53,8 +59,18 @@ npm run web        # ou abra no navegador
 ```bash
 npm run lint        # lint do back-end e do app
 npm run typecheck   # checagem de tipos
-npm test            # testes do back-end
+npm test            # testes unitários do back-end
+
+# Testes de integração e e2e (precisam do docker compose up -d)
+cd backend && npm run test:e2e
 ```
+
+## Persistência
+
+- Esquema criado **somente por migrations** (`synchronize: false`), registradas em `backend/src/database/migrations/index.ts`.
+- Camada `utilitarioPersistencia`: `ObjetoPersistente` (UUID + carimbos de data), interface `DAO` e `DAOTypeORM` genérico; DAOs concretos estendem `DAOTypeORM` (ex.: `UsuarioDAO`).
+- `Usuario` usa herança em tabela única: `Paciente` e `Profissional`, discriminados pela coluna enumerada `papel`.
+- Os testes de integração recriam o banco `mind_test` do zero e verificam que o esquema das migrations corresponde às entidades.
 
 ## Fluxo de trabalho
 
