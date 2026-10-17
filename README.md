@@ -1,5 +1,7 @@
 # Mind – MVP
 
+[![CI](https://github.com/eduardoarrigoni/mind-mvp/actions/workflows/ci.yml/badge.svg)](https://github.com/eduardoarrigoni/mind-mvp/actions/workflows/ci.yml)
+
 Sistema de apoio ao acompanhamento de saúde mental. O paciente registra sua rotina e seu estado de saúde e acompanha o próprio progresso; o profissional de saúde acompanha seus pacientes conforme as permissões concedidas.
 
 > O Mind é **complementar** à atuação do profissional: não substitui avaliação, diagnóstico ou decisão clínica.
@@ -64,6 +66,14 @@ npm test            # testes unitários do back-end
 # Testes de integração e e2e (precisam do docker compose up -d)
 cd backend && npm run test:e2e
 ```
+
+## Integração contínua
+
+O workflow `.github/workflows/ci.yml` roda em todo push na `main` e em todo Pull Request:
+
+- **Back-end:** lint, checagem de tipos, build, testes unitários com cobertura (mínimo de **60%** de linhas na camada de lógica de negócio – CQ08) e testes de integração/e2e contra um PostgreSQL de serviço.
+- **App:** lint e checagem de tipos.
+- O resumo da cobertura aparece na página da execução e o relatório HTML fica disponível como artefato (`cobertura-backend`).
 
 ## Persistência
 

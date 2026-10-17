@@ -1,0 +1,113 @@
+# PB03 – Integração contínua do Mind.
+# Executa em todo push na main e em todo Pull Request.
+# Falha (e bloqueia o merge, com a proteção de branch) se lint, tipos,
+# build, testes ou a cobertura mínima de 60% (CQ08) não forem atendidos.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Back-end (lint, testes e cobertura)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: mind
+          POSTGRES_PASSWORD: mind
+          POSTGRES_DB: mind_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U mind -d mind_test"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: mind
+      DB_PASSWORD: mind
+      DB_NAME_TEST: mind_test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Checagem de tipos
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Testes unitários com cobertura (mínimo 60% – CQ08)
+        run: npm run test:cov
+
+      - name: Testes de integração e e2e (PostgreSQL)
+        run: npm run test:e2e
+
+      - name: Resumo da cobertura
+        if: always()
+        run: |
+          if [ -f coverage/coverage-summary.json ]; then
+            node -e "
+              const t = require('./coverage/coverage-summary.json').total;
+              const linha = (n, m) => '| ' + n + ' | ' + m.pct + '% (' + m.covered + '/' + m.total + ') |';
+              console.log(['## Cobertura – camada de lógica de negócio', '', '| Métrica | Valor |', '|---|---|',
+                linha('Linhas', t.lines), linha('Instruções', t.statements),
+                linha('Funções', t.functions), linha('Ramos', t.branches)].join('\n'));
+            " >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Publicar relatório de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura-backend
+          path: backend/coverage
+          if-no-files-found: ignore
+
+  app:
+    name: App (lint e tipos)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Checagem de tipos
+        run: npm run typecheck

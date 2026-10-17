@@ -9,5 +9,12 @@ export default defineConfig({
     globals: true,
     root: './',
     include: ['**/*.spec.ts'],
+    coverage: {
+      provider: 'v8',
+      // CQ08: cobertura medida na camada de lógica de negócio (classes Apl...).
+      include: ['src/**/*.service.ts'],
+      reporter: ['text', 'json-summary', 'html', 'lcov'],
+      thresholds: { lines: 60 },
+    },
   },
 });
