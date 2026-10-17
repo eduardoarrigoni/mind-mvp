@@ -17,7 +17,7 @@ Sistema de apoio ao acompanhamento de saúde mental. O paciente registra sua rot
 | App mobile | React Native + Expo (TypeScript), código único Android/iOS |
 | Back-end | NestJS (TypeScript), API REST |
 | Banco | PostgreSQL + TypeORM (migrations, `synchronize: false`) |
-| Testes | Vitest + Supertest (back-end) |
+| Testes | Vitest + Supertest (back-end), Jest + Testing Library (app) |
 | Qualidade | oxlint (back-end), ESLint (app), Prettier, GitHub Actions |
 
 ## Estrutura
@@ -54,6 +54,8 @@ npm run start:dev
 cd app
 npm start          # escaneie o QR code com o Expo Go
 npm run web        # ou abra no navegador
+# Para testar no celular, aponte o app para o IP do computador:
+# EXPO_PUBLIC_API_URL=http://SEU_IP:3000 npm start
 ```
 
 ## Qualidade
@@ -62,6 +64,7 @@ npm run web        # ou abra no navegador
 npm run lint        # lint do back-end e do app
 npm run typecheck   # checagem de tipos
 npm test            # testes unitários do back-end
+cd app && npm test  # testes do app (cliente HTTP e componentes)
 
 # Testes de integração e e2e (precisam do docker compose up -d)
 cd backend && npm run test:e2e
@@ -72,7 +75,7 @@ cd backend && npm run test:e2e
 O workflow `.github/workflows/ci.yml` roda em todo push na `main` e em todo Pull Request:
 
 - **Back-end:** lint, checagem de tipos, build, testes unitários com cobertura (mínimo de **60%** de linhas na camada de lógica de negócio – CQ08) e testes de integração/e2e contra um PostgreSQL de serviço.
-- **App:** lint e checagem de tipos.
+- **App:** lint, checagem de tipos e testes (Jest + jest-expo).
 - O resumo da cobertura aparece na página da execução e o relatório HTML fica disponível como artefato (`cobertura-backend`).
 
 ## Persistência
