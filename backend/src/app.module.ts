@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
+import { AuthModule } from './auth/auth.module.js';
 import { opcoesBanco } from './database/data-source.js';
 import { UsuariosModule } from './usuarios/usuarios.module.js';
 
@@ -11,6 +12,7 @@ import { UsuariosModule } from './usuarios/usuarios.module.js';
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({ useFactory: () => opcoesBanco() }),
     UsuariosModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
