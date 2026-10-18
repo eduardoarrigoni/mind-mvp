@@ -11,8 +11,14 @@ export default defineConfig({
     include: ['**/*.spec.ts'],
     coverage: {
       provider: 'v8',
-      // CQ08: cobertura medida na camada de lógica de negócio (classes Apl...).
-      include: ['src/**/*.service.ts'],
+      // CQ08: cobertura medida na camada de lógica de negócio (classes Apl...)
+      // e nas regras de segurança (guards de token, PAPEL e TCLE) – PB10.
+      include: [
+        'src/**/*.service.ts',
+        'src/**/guards.ts',
+        'src/**/*.guard.ts',
+        'src/auth/jwt.config.ts',
+      ],
       reporter: ['text', 'json-summary', 'html', 'lcov'],
       thresholds: { lines: 60 },
     },
