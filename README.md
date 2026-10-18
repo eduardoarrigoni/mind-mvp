@@ -85,6 +85,18 @@ O workflow `.github/workflows/ci.yml` roda em todo push na `main` e em todo Pull
 - `Usuario` usa herança em tabela única: `Paciente` e `Profissional`, discriminados pela coluna enumerada `papel`.
 - Os testes de integração recriam o banco `mind_test` do zero e verificam que o esquema das migrations corresponde às entidades.
 
+## Autenticação
+
+| Rota | Acesso | Descrição |
+|---|---|---|
+| `POST /auth/cadastro` | pública | Cadastro de paciente (UC01) |
+| `POST /auth/login` | pública | Devolve `{ accessToken, usuario }`; erro **401** genérico ("E-mail ou senha inválidos.") |
+| `GET /auth/eu` | token | Perfil do usuário autenticado |
+
+- Todas as rotas exigem `Authorization: Bearer <token>`, exceto as marcadas com `@Publico()`.
+- `@Papeis(Papel.PROFISSIONAL)` restringe uma rota por PAPEL (403 para os demais).
+- `JWT_SECRET` é obrigatório em produção; `JWT_EXPIRES_IN` padrão `8h` (ver `backend/.env.example`).
+
 ## Fluxo de trabalho
 
 - Cada card do Trello vira uma branch `card-XX-descricao` (ex.: `card-01-monorepo`).
