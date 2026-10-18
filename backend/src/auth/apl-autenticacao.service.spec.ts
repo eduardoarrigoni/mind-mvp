@@ -1,6 +1,7 @@
-import { ConflictException } from '@nestjs/common';
+﻿import { ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcryptjs';
+import { AplConsentimento } from '../consentimento/apl-consentimento.service.js';
 import { UsuarioDAO } from '../usuarios/usuario.dao.js';
 import { Paciente, Papel } from '../usuarios/usuario.entity.js';
 import { AplAutenticacao, CUSTO_BCRYPT } from './apl-autenticacao.service.js';
@@ -27,7 +28,9 @@ describe('AplAutenticacao – cadastro de paciente (UC01)', () => {
           Object.assign(p, { id: 'uuid-1', criadoEm: new Date() }),
         ),
     };
-    apl = new AplAutenticacao(dao as unknown as UsuarioDAO, new JwtService());
+    apl = new AplAutenticacao(dao as unknown as UsuarioDAO, new JwtService(), {
+      aceitouVigente: vi.fn(),
+    } as unknown as AplConsentimento);
   });
 
   it('cria um Paciente com e-mail normalizado e nome sem espaços extras', async () => {

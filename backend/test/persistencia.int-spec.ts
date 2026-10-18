@@ -107,14 +107,22 @@ describe('Persistência (integração com PostgreSQL)', () => {
     ).rejects.toThrow(/UQ_usuario_email/);
   });
 
-  it('a migration pode ser revertida e reaplicada (rollback validado)', async () => {
-    await fonte.undoLastMigration();
-    const [{ existe }] = await fonte.query(
-      `SELECT to_regclass('public.usuario') IS NOT NULL AS existe`,
+  it('todas as migrations podem ser revertidas e reaplicadas (rollback validado)', async () => {
+    for (let i = 0; i < fonte.migrations.length; i++) {
+      await fonte.undoLastMigration();
+    }
+    const [tabelas] = await fonte.query(
+      `SELECT to_regclass('public.usuario') IS NULL
+          AND to_regclass('public.termo_consentimento') IS NULL
+          AND to_regclass('public.aceite_tcle') IS NULL AS removidas`,
     );
-    expect(existe).toBe(false);
+    expect(tabelas.removidas).toBe(true);
 
     await fonte.runMigrations();
     expect(await fonte.showMigrations()).toBe(false);
+    const [{ total }] = await fonte.query(
+      'SELECT count(*)::int AS total FROM termo_consentimento',
+    );
+    expect(total).toBe(1);
   });
 });

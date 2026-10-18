@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcryptjs';
+import { AplConsentimento } from '../consentimento/apl-consentimento.service.js';
 import { UsuarioDAO } from '../usuarios/usuario.dao.js';
 import { Paciente, Papel, Usuario } from '../usuarios/usuario.entity.js';
 import { CadastroPacienteDto } from './dto/cadastro-paciente.dto.js';
@@ -25,7 +26,12 @@ const HASH_FICTICIO =
 
 export interface Sessao {
   accessToken: string;
-  usuario: UsuarioPublico;
+  usuario: PerfilUsuario;
+}
+
+/** Usuário público + situação do TCLE (o app decide se mostra o termo ou a Home). */
+export interface PerfilUsuario extends UsuarioPublico {
+  tcleAceito: boolean;
 }
 
 export interface UsuarioPublico {
@@ -43,6 +49,7 @@ export class AplAutenticacao {
   constructor(
     private readonly usuarios: UsuarioDAO,
     private readonly jwt: JwtService,
+    private readonly consentimento: AplConsentimento,
   ) {}
 
   /** UC01 – cadastro de paciente. */
@@ -85,14 +92,21 @@ export class AplAutenticacao {
       sub: usuario.id,
       papel: usuario.papel,
     });
-    return { accessToken, usuario: this.paraPublico(usuario) };
+    return { accessToken, usuario: await this.paraPerfil(usuario) };
   }
 
-  /** Dados do usuário autenticado (rota protegida GET /auth/eu). */
-  async buscarPerfil(id: string): Promise<UsuarioPublico> {
+  /** Dados do usuário autenticado (rota protegida GET /auth/me). */
+  async buscarPerfil(id: string): Promise<PerfilUsuario> {
     const usuario = await this.usuarios.buscarPorId(id);
     if (!usuario) throw new UnauthorizedException('Sessão inválida.');
-    return this.paraPublico(usuario);
+    return this.paraPerfil(usuario);
+  }
+
+  private async paraPerfil(usuario: Usuario): Promise<PerfilUsuario> {
+    return {
+      ...this.paraPublico(usuario),
+      tcleAceito: await this.consentimento.aceitouVigente(usuario.id),
+    };
   }
 
   /** Nunca expõe o hash da senha. */

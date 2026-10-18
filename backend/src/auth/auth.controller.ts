@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import {
   AplAutenticacao,
+  PerfilUsuario,
   Sessao,
   UsuarioPublico,
 } from './apl-autenticacao.service.js';
@@ -36,9 +37,9 @@ export class AuthController {
     return this.aplAutenticacao.entrar(dados);
   }
 
-  /** Perfil do usuário autenticado (exige token). */
-  @Get('eu')
-  perfil(@UsuarioAtual() usuario: UsuarioAutenticado): Promise<UsuarioPublico> {
+  /** Perfil do usuário autenticado e situação do TCLE (exige token). */
+  @Get('me')
+  perfil(@UsuarioAtual() usuario: UsuarioAutenticado): Promise<PerfilUsuario> {
     return this.aplAutenticacao.buscarPerfil(usuario.id);
   }
 }
