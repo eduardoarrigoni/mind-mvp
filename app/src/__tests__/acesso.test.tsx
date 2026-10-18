@@ -26,6 +26,12 @@ jest.mock('expo-router', () => ({
 jest.mock('../api/auth', () => ({
   apiAuth: { entrar: jest.fn(), cadastrar: jest.fn(), perfil: jest.fn() },
 }));
+jest.mock('../api/checkins', () => ({
+  apiCheckins: {
+    deHoje: jest.fn().mockResolvedValue(null),
+    registrar: jest.fn(),
+  },
+}));
 
 const api = apiAuth as jest.Mocked<typeof apiAuth>;
 

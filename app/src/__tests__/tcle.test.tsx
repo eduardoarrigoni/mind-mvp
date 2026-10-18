@@ -31,6 +31,12 @@ jest.mock('../api/auth', () => ({
 jest.mock('../api/tcle', () => ({
   apiTcle: { vigente: jest.fn(), aceitar: jest.fn() },
 }));
+jest.mock('../api/checkins', () => ({
+  apiCheckins: {
+    deHoje: jest.fn().mockResolvedValue(null),
+    registrar: jest.fn(),
+  },
+}));
 
 const auth = apiAuth as jest.Mocked<typeof apiAuth>;
 const tcle = apiTcle as jest.Mocked<typeof apiTcle>;
