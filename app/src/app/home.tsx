@@ -113,6 +113,11 @@ export default function Home() {
         />
       )}
       <Botao
+        titulo="Ver meu histórico"
+        variante="secundario"
+        onPress={() => router.push('/historico')}
+      />
+      <Botao
         titulo="Sair"
         variante="secundario"
         onPress={async () => {
