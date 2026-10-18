@@ -70,11 +70,13 @@ cd app && npm test  # testes do app (cliente HTTP e componentes)
 cd backend && npm run test:e2e
 ```
 
+Evidências de teste por critério de aceitação: [`docs/testes-incremento1.md`](docs/testes-incremento1.md).
+
 ## Integração contínua
 
 O workflow `.github/workflows/ci.yml` roda em todo push na `main` e em todo Pull Request:
 
-- **Back-end:** lint, checagem de tipos, build, testes unitários com cobertura (mínimo de **60%** de linhas na camada de lógica de negócio – CQ08) e testes de integração/e2e contra um PostgreSQL de serviço.
+- **Back-end:** lint, checagem de tipos, build, testes unitários com cobertura (mínimo de **60%** de linhas na camada de lógica de negócio e nos guards de segurança – CQ08) e testes de integração/e2e contra um PostgreSQL de serviço.
 - **App:** lint, checagem de tipos e testes (Jest + jest-expo).
 - O resumo da cobertura aparece na página da execução e o relatório HTML fica disponível como artefato (`cobertura-backend`).
 
