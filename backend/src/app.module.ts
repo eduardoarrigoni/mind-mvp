@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
+import { CheckinsModule } from './checkins/checkins.module.js';
 import { opcoesBanco } from './database/data-source.js';
 import { UsuariosModule } from './usuarios/usuarios.module.js';
 
@@ -13,6 +14,7 @@ import { UsuariosModule } from './usuarios/usuarios.module.js';
     TypeOrmModule.forRootAsync({ useFactory: () => opcoesBanco() }),
     UsuariosModule,
     AuthModule,
+    CheckinsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

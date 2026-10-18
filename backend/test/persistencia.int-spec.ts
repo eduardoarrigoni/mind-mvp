@@ -114,7 +114,8 @@ describe('Persistência (integração com PostgreSQL)', () => {
     const [tabelas] = await fonte.query(
       `SELECT to_regclass('public.usuario') IS NULL
           AND to_regclass('public.termo_consentimento') IS NULL
-          AND to_regclass('public.aceite_tcle') IS NULL AS removidas`,
+          AND to_regclass('public.aceite_tcle') IS NULL
+          AND to_regclass('public.checkin') IS NULL AS removidas`,
     );
     expect(tabelas.removidas).toBe(true);
 

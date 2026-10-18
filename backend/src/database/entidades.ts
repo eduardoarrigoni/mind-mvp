@@ -1,3 +1,4 @@
+import { Checkin } from '../checkins/checkin.entity.js';
 import {
   AceiteTcle,
   TermoConsentimento,
@@ -11,4 +12,5 @@ export const ENTIDADES = [
   Profissional,
   TermoConsentimento,
   AceiteTcle,
+  Checkin,
 ];
