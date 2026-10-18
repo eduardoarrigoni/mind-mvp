@@ -70,7 +70,7 @@ cd app && npm test  # testes do app (cliente HTTP e componentes)
 cd backend && npm run test:e2e
 ```
 
-Evidências de teste por critério de aceitação: [`docs/testes-incremento1.md`](docs/testes-incremento1.md).
+Evidências de teste por critério de aceitação: [`docs/testes-incremento1.md`](docs/testes-incremento1.md) e [`docs/testes-incremento2.md`](docs/testes-incremento2.md).
 
 ## Integração contínua
 
