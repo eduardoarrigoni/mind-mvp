@@ -97,6 +97,7 @@ O workflow `.github/workflows/ci.yml` roda em todo push na `main` e em todo Pull
 | `GET /tcle/vigente` | pública | Texto, versão e início de vigência do TCLE (UC13) |
 | `POST /tcle/aceite` | token (PACIENTE) | Registra o aceite da versão informada (`{ "versao": "1.0" }`); 409 se não for a vigente |
 | `POST /checkins` | token (PACIENTE + TCLE) | Check-in do dia (UC04): `humor` e `energia` 1–5, `horasSono` 0–24, `observacao` opcional (≤ 500). 201 ao criar, 200 ao atualizar o do mesmo dia (fuso America/Sao_Paulo) |
+| `GET /checkins?dias=30` | token (PACIENTE) | Histórico do próprio paciente (UC10 parcial), do mais recente ao mais antigo; `dias` de 1 a 90, padrão 30 |
 
 - Todas as rotas exigem `Authorization: Bearer <token>`, exceto as marcadas com `@Publico()`.
 - `@Papeis(Papel.PROFISSIONAL)` restringe uma rota por PAPEL (403 para os demais).

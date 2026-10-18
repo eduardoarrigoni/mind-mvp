@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { Paciente } from '../usuarios/usuario.entity.js';
 import { CheckinDAO } from './checkin.dao.js';
 import { Checkin } from './checkin.entity.js';
-import { dataLocal } from './data-local.js';
+import { dataLocal, somarDias } from './data-local.js';
 import { CheckinDto } from './dto/checkin.dto.js';
+import { DIAS_PADRAO } from './dto/historico.dto.js';
 
 export interface CheckinPublico {
   id: string;
@@ -58,6 +59,20 @@ export class AplCheckin {
       }
       throw erro;
     }
+  }
+
+  /**
+   * UC10 (parcial) – histórico do paciente nos últimos `dias` dias, contando
+   * hoje, do mais recente ao mais antigo. Só os check-ins do próprio paciente.
+   */
+  async historico(
+    pacienteId: string,
+    dias = DIAS_PADRAO,
+    agora: Date = new Date(),
+  ): Promise<CheckinPublico[]> {
+    const desde = somarDias(dataLocal(agora), -(dias - 1));
+    const checkins = await this.checkins.listarDesde(pacienteId, desde);
+    return checkins.map((c) => this.paraPublico(c));
   }
 
   private async atualizar(
