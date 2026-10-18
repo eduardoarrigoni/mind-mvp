@@ -1,7 +1,7 @@
 import { AplCheckin } from './apl-checkin.service.js';
 import { CheckinDAO } from './checkin.dao.js';
 import { Checkin } from './checkin.entity.js';
-import { dataLocal } from './data-local.js';
+import { dataLocal, somarDias } from './data-local.js';
 
 const dados = { humor: 4, energia: 3, horasSono: 7.5, observacao: 'Dia bom' };
 
@@ -94,6 +94,47 @@ describe('AplCheckin – check-in diário (UC04)', () => {
     await expect(apl.registrar('paciente-1', dados)).rejects.toThrow(
       'banco fora do ar',
     );
+  });
+});
+
+describe('AplCheckin – histórico (UC10 parcial)', () => {
+  const noiteDe17 = new Date('2026-10-18T01:30:00Z'); // 17/10 22:30 em SP
+
+  it('busca do paciente do token a partir de hoje − (dias − 1)', async () => {
+    const { apl, dao } = montar();
+    const lista = [
+      Object.assign(new Checkin(), { id: 'c2', data: '2026-10-17', humor: 4 }),
+      Object.assign(new Checkin(), { id: 'c1', data: '2026-10-10', humor: 2 }),
+    ];
+    Object.assign(dao, { listarDesde: vi.fn().mockResolvedValue(lista) });
+
+    const historico = await apl.historico('paciente-1', 30, noiteDe17);
+
+    expect(
+      (dao as unknown as { listarDesde: ReturnType<typeof vi.fn> }).listarDesde,
+    ).toHaveBeenCalledWith('paciente-1', '2026-09-18');
+    expect(historico.map((c) => c.id)).toEqual(['c2', 'c1']);
+  });
+
+  it('janela de 1 dia = só hoje; padrão = 30 dias', async () => {
+    const { apl, dao } = montar();
+    const listarDesde = vi.fn().mockResolvedValue([]);
+    Object.assign(dao, { listarDesde });
+
+    await apl.historico('p', 1, noiteDe17);
+    await apl.historico('p', undefined, noiteDe17);
+    expect(listarDesde.mock.calls.map((c) => c[1])).toEqual([
+      '2026-10-17',
+      '2026-09-18',
+    ]);
+  });
+});
+
+describe('somarDias', () => {
+  it('atravessa meses e anos', () => {
+    expect(somarDias('2026-10-01', -1)).toBe('2026-09-30');
+    expect(somarDias('2026-12-31', 1)).toBe('2027-01-01');
+    expect(somarDias('2024-03-01', -1)).toBe('2024-02-29');
   });
 });
 
