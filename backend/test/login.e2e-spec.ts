@@ -1,4 +1,4 @@
-import { Controller, Get, INestApplication } from '@nestjs/common';
+﻿import { Controller, Get, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import bcrypt from 'bcryptjs';
 import request from 'supertest';
@@ -84,16 +84,16 @@ describe('POST /auth/login e rotas protegidas (e2e – UC01)', () => {
       .expect(400);
   });
 
-  it('GET /auth/eu: 401 sem token, 401 com token inválido, 200 com token', async () => {
-    await http().get('/auth/eu').expect(401);
+  it('GET /auth/me: 401 sem token, 401 com token inválido, 200 com token', async () => {
+    await http().get('/auth/me').expect(401);
     await http()
-      .get('/auth/eu')
+      .get('/auth/me')
       .set('Authorization', 'Bearer token.invalido.aqui')
       .expect(401);
 
     const { body } = await entrar(paciente.email, paciente.senha);
     const res = await http()
-      .get('/auth/eu')
+      .get('/auth/me')
       .set('Authorization', `Bearer ${body.accessToken}`)
       .expect(200);
     expect(res.body).toMatchObject({ email: 'carlos@mind.app' });

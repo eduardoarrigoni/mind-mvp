@@ -91,10 +91,14 @@ O workflow `.github/workflows/ci.yml` roda em todo push na `main` e em todo Pull
 |---|---|---|
 | `POST /auth/cadastro` | pública | Cadastro de paciente (UC01) |
 | `POST /auth/login` | pública | Devolve `{ accessToken, usuario }`; erro **401** genérico ("E-mail ou senha inválidos.") |
-| `GET /auth/eu` | token | Perfil do usuário autenticado |
+| `GET /auth/me` | token | Perfil do usuário autenticado + `tcleAceito` |
+| `GET /tcle/vigente` | pública | Texto, versão e início de vigência do TCLE (UC13) |
+| `POST /tcle/aceite` | token (PACIENTE) | Registra o aceite da versão informada (`{ "versao": "1.0" }`); 409 se não for a vigente |
 
 - Todas as rotas exigem `Authorization: Bearer <token>`, exceto as marcadas com `@Publico()`.
 - `@Papeis(Papel.PROFISSIONAL)` restringe uma rota por PAPEL (403 para os demais).
+- `@ExigeTcle()` marca rotas de registro clínico: paciente sem aceite do TCLE vigente recebe 403 (RN08).
+- Novas versões do TCLE entram por migration (nova linha em `termo_consentimento`); o login e `/auth/me` informam se a versão vigente já foi aceita.
 - `JWT_SECRET` é obrigatório em produção; `JWT_EXPIRES_IN` padrão `8h` (ver `backend/.env.example`).
 
 ## Fluxo de trabalho

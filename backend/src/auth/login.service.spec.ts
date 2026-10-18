@@ -1,6 +1,7 @@
-import { UnauthorizedException } from '@nestjs/common';
+﻿import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcryptjs';
+import { AplConsentimento } from '../consentimento/apl-consentimento.service.js';
 import { UsuarioDAO } from '../usuarios/usuario.dao.js';
 import { Paciente, Papel } from '../usuarios/usuario.entity.js';
 import {
@@ -16,6 +17,7 @@ describe('AplAutenticacao – login (UC01)', () => {
     buscarPorEmail: ReturnType<typeof vi.fn>;
     buscarPorId: ReturnType<typeof vi.fn>;
   };
+  let consentimento: { aceitouVigente: ReturnType<typeof vi.fn> };
   let apl: AplAutenticacao;
 
   beforeAll(async () => {
@@ -35,7 +37,22 @@ describe('AplAutenticacao – login (UC01)', () => {
       buscarPorEmail: vi.fn().mockResolvedValue(paciente),
       buscarPorId: vi.fn().mockResolvedValue(paciente),
     };
-    apl = new AplAutenticacao(dao as unknown as UsuarioDAO, jwt);
+    consentimento = { aceitouVigente: vi.fn().mockResolvedValue(false) };
+    apl = new AplAutenticacao(
+      dao as unknown as UsuarioDAO,
+      jwt,
+      consentimento as unknown as AplConsentimento,
+    );
+  });
+
+  it('a sessão informa se o TCLE vigente já foi aceito', async () => {
+    expect(
+      (await apl.entrar({ email: 'ana@mind.app', senha })).usuario.tcleAceito,
+    ).toBe(false);
+
+    consentimento.aceitouVigente.mockResolvedValue(true);
+    expect((await apl.buscarPerfil('uuid-1')).tcleAceito).toBe(true);
+    expect(consentimento.aceitouVigente).toHaveBeenCalledWith('uuid-1');
   });
 
   it('devolve um JWT com o id e o PAPEL do usuário', async () => {
